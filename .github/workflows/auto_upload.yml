@@ -5,7 +5,10 @@ on:
     # Chạy mỗi phút thứ 5 của mỗi giờ
     - cron: '5 * * * *'
   workflow_dispatch:  # Cho phép chạy thủ công
-
+  
+permissions:
+  contents: write
+  
 jobs:
   upload:
     runs-on: ubuntu-latest
@@ -32,8 +35,7 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add . # Thêm tất cả các file đã thay đổi (bao gồm cả file đã bị xóa)
-        # Chỉ commit và push nếu có sự thay đổi
+        git add . 
         if ! git diff --staged --quiet; then
           git commit -m "Auto: Update chapter files after upload"
           git push
