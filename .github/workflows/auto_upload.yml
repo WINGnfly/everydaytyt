@@ -2,9 +2,9 @@ name: Auto Upload Chapters
 
 on:
   schedule:
-    # Chạy mỗi phút thứ 5 của mỗi giờ (tức 01:05, 02:05, ..., 23:05)
+    # Chạy mỗi phút thứ 5 của mỗi giờ (01:05, 02:05, ..., 23:05)
     - cron: '5 * * * *'
-  workflow_dispatch:  # Cho phép chạy thủ công từ GitHub
+  workflow_dispatch:  # Cho phép chạy thủ công
 
 jobs:
   upload:
@@ -23,4 +23,6 @@ jobs:
       run: pip install requests
 
     - name: Run upload script
+      env:  # ✅ Thêm biến môi trường AUTH_TOKEN tại đây
+        AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
       run: python chapter_uploader.py
