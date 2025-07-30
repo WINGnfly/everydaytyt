@@ -15,6 +15,28 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+async function ensureCookies() {
+  if (fs.existsSync('cookies.json')) return;
+
+  console.log('🔐 Chưa có cookies.json, mở trình duyệt để đăng nhập...');
+  const browser = await puppeteer.connect({ browserWSEndpoint: BROWSERLESS_URL });
+  const page = await browser.newPage();
+
+  await page.goto('https://tytnovel.xyz/', { waitUntil: 'networkidle2' });
+
+  console.log('👉 Hãy đăng nhập bằng Google trong trình duyệt đang mở...');
+
+  await page.waitForFunction(() => {
+    return document.cookie.includes('ci_session') || document.cookie.includes('hs_id');
+  }, { timeout: 5 * 60 * 1000 });
+
+  const cookies = await page.cookies();
+  fs.writeFileSync('cookies.json', JSON.stringify(cookies, null, 2));
+
+  console.log('✅ Đã lưu cookies vào cookies.json');
+  await browser.close();
+}
+
 async function postChapters(bookid) {
   const filePath = path.resolve(dataDir, `${bookid}.txt`);
   const progressPath = path.resolve(__dirname, `progress.json`);
@@ -63,6 +85,8 @@ async function postChapters(bookid) {
 }
 
 (async () => {
+  await ensureCookies();
+
   for (const bookid of books) {
     try {
       await postChapters(bookid);
