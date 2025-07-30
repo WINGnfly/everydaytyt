@@ -1,0 +1,29 @@
+name: Post Chapters Randomly
+
+on:
+  schedule:
+    # Chạy mỗi 15 phút, script bên trong sẽ quyết định delay thực tế 60–90 phút
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    env:
+      BOOK_ID: 68889f366ef4ae1d4f02175b
+      BROWSERLESS_API_KEY: ${{ secrets.BROWSERLESS_API_KEY }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install puppeteer-core node-fetch
+
+      - name: Run post script
+        run: node script.js
