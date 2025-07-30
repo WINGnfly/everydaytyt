@@ -10,7 +10,6 @@ jobs:
   post:
     runs-on: ubuntu-latest
     env:
-      BOOK_ID: 68889f366ef4ae1d4f02175b
       BROWSERLESS_API_KEY: ${{ secrets.BROWSERLESS_API_KEY }}
 
     steps:
