@@ -1,28 +1,26 @@
-name: Post Chapters Randomly
+name: Post Chapters
 
 on:
   schedule:
-    # Chạy cố định vào phút 05 mỗi giờ
-    - cron: '5 * * * *'
+    - cron: '5 * * * *'  # chạy mỗi giờ lúc phút 05
   workflow_dispatch:
 
 jobs:
   post:
     runs-on: ubuntu-latest
-    env:
-      BROWSERLESS_API_KEY: ${{ secrets.BROWSERLESS_API_KEY }}
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 18
 
       - name: Install dependencies
-        run: npm install puppeteer-core node-fetch
+        run: npm install puppeteer-core
 
-      - name: Run post script
+      - name: Run posting script
+        env:
+          BROWSERLESS_API_KEY: ${{ secrets.BROWSERLESS_API_KEY }}
         run: node script.js
