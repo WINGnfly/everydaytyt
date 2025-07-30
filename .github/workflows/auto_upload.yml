@@ -2,7 +2,7 @@ name: Auto Upload Chapters
 
 on:
   schedule:
-    # Chạy mỗi phút thứ 5 của mỗi giờ (01:05, 02:05, ..., 23:05)
+    # Chạy mỗi phút thứ 5 của mỗi giờ
     - cron: '5 * * * *'
   workflow_dispatch:  # Cho phép chạy thủ công
 
@@ -11,18 +11,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
+    - name: 1. Checkout repo
       uses: actions/checkout@v4
 
-    - name: Setup Python
+    - name: 2. Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: 3.11
 
-    - name: Install dependencies
+    - name: 3. Install dependencies
       run: pip install requests
 
-    - name: Run upload script
-      env:  # ✅ Thêm biến môi trường AUTH_TOKEN tại đây
+    - name: 4. Run upload script
+      env:
         AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
       run: python chapter_uploader.py
+
+    # 👇 BƯỚC QUAN TRỌNG ĐƯỢC THÊM VÀO 👇
+    - name: 5. Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add . # Thêm tất cả các file đã thay đổi (bao gồm cả file đã bị xóa)
+        # Chỉ commit và push nếu có sự thay đổi
+        if ! git diff --staged --quiet; then
+          git commit -m "Auto: Update chapter files after upload"
+          git push
+        else
+          echo "No changes to commit."
+        fi
