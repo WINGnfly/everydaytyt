@@ -1,0 +1,26 @@
+name: Auto Upload Chapters
+
+on:
+  schedule:
+    # Chạy mỗi phút thứ 5 của mỗi giờ (tức 01:05, 02:05, ..., 23:05)
+    - cron: '5 * * * *'
+  workflow_dispatch:  # Cho phép chạy thủ công từ GitHub
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.11
+
+    - name: Install dependencies
+      run: pip install requests
+
+    - name: Run upload script
+      run: python chapter_uploader.py
