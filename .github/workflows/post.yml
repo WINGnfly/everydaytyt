@@ -2,8 +2,8 @@ name: Post Chapters Randomly
 
 on:
   schedule:
-    # Chạy mỗi 15 phút, script bên trong sẽ quyết định delay thực tế 60–90 phút
-    - cron: '*/15 * * * *'
+    # Chạy cố định vào phút 05 mỗi giờ
+    - cron: '5 * * * *'
   workflow_dispatch:
 
 jobs:
