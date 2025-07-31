@@ -2,8 +2,10 @@ name: Auto Upload Chapters
 
 on:
   schedule:
-    # Chạy mỗi phút thứ 5 của mỗi giờ
-    - cron: '5 * * * *'
+    # Chạy phút thứ 5, mỗi 2 giờ, từ 9h sáng đến 1h sáng (hôm sau) giờ VN.
+    # Tức là KHÔNG chạy trong khung giờ 2h sáng - 8h sáng VN.
+    # (Tương đương 2h-18h UTC, mỗi 2 giờ)
+    - cron: '5 2-18/2 * * *'
   workflow_dispatch:  # Cho phép chạy thủ công
   
 permissions:
@@ -25,17 +27,24 @@ jobs:
     - name: 3. Install dependencies
       run: pip install requests
 
-    - name: 4. Run upload script
+    # 👇 BƯỚC MỚI: Thêm delay ngẫu nhiên 👇
+    - name: 4. Add random delay (0-3 minutes)
+      run: |
+        delay_seconds=$((RANDOM % 181))
+        echo "Delaying for $delay_seconds seconds to avoid simultaneous runs..."
+        sleep $delay_seconds
+        
+    - name: 5. Run upload script
       env:
         AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
       run: python chapter_uploader.py
 
-    # 👇 BƯỚC QUAN TRỌNG ĐƯỢC THÊM VÀO 👇
-    - name: 5. Commit and push changes
+    - name: 6. Commit and push changes
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add . 
+        # Chỉ commit và push nếu có thay đổi
         if ! git diff --staged --quiet; then
           git commit -m "Auto: Update chapter files after upload"
           git push
