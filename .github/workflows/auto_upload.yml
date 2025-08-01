@@ -28,9 +28,9 @@ jobs:
       run: pip install requests
 
     # 👇 BƯỚC MỚI: Thêm delay ngẫu nhiên 👇
-    - name: 4. Add random delay (0-3 minutes)
+    - name: 4. Add random delay (0-1 minutes)
       run: |
-        delay_seconds=$((RANDOM % 181))
+        delay_seconds=$((RANDOM % 61))
         echo "Delaying for $delay_seconds seconds to avoid simultaneous runs..."
         sleep $delay_seconds
         
