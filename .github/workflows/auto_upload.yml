@@ -1,12 +1,12 @@
 name: Auto Upload Chapters
 
-on:
-  schedule:
-    # Chạy phút thứ 5, mỗi 2 giờ, từ 9h sáng đến 1h sáng (hôm sau) giờ VN.
-    # Tức là KHÔNG chạy trong khung giờ 2h sáng - 8h sáng VN.
-    # (Tương đương 2h-18h UTC, mỗi 2 giờ)
-    - cron: '5 2-18/3 * * *'
-  workflow_dispatch:  # Cho phép chạy thủ công
+# on:
+#   schedule:
+#     # Chạy phút thứ 5, mỗi 2 giờ, từ 9h sáng đến 1h sáng (hôm sau) giờ VN.
+#     # Tức là KHÔNG chạy trong khung giờ 2h sáng - 8h sáng VN.
+#     # (Tương đương 2h-18h UTC, mỗi 2 giờ)
+#     - cron: '5 2-18/3 * * *'
+#   workflow_dispatch:  # Cho phép chạy thủ công
   
 permissions:
   contents: write
