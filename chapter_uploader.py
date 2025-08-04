@@ -10,7 +10,7 @@ AUTH_TOKEN = os.environ.get("AUTH_TOKEN")
 
 # 🔧 Cấu hình
 FOLDER_PATH = "noveldata"  # Thư mục chứa các file chương
-CHAPTERS_PER_RUN = 10       # Số chương mỗi truyện sẽ đăng mỗi lần chạy
+CHAPTERS_PER_RUN = 3       # Số chương mỗi truyện sẽ đăng mỗi lần chạy
 
 # ============================================
 # TÁCH CHƯƠNG TỪ FILE TXT
