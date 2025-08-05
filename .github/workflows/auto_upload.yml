@@ -1,12 +1,12 @@
 name: Auto Upload Chapters
 
-# on:
-#   schedule:
-#     # Chạy phút thứ 5, mỗi 2 giờ, từ 9h sáng đến 1h sáng (hôm sau) giờ VN.
-#     # Tức là KHÔNG chạy trong khung giờ 2h sáng - 8h sáng VN.
-#     # (Tương đương 2h-18h UTC, mỗi 2 giờ)
-#     - cron: '5 2-18/3 * * *'
-#   workflow_dispatch:  # Cho phép chạy thủ công
+on:
+  schedule:
+    # Chạy phút thứ 5, mỗi 2 giờ, từ 9h sáng đến 1h sáng (hôm sau) giờ VN.
+    # Tức là KHÔNG chạy trong khung giờ 2h sáng - 8h sáng VN.
+    # (Tương đương 2h-18h UTC, mỗi 2 giờ)
+    - cron: '5 0-19/1 * * *'
+  workflow_dispatch:  # Cho phép chạy thủ công
   
 permissions:
   contents: write
@@ -36,18 +36,13 @@ jobs:
         
     - name: 5. Run upload script
       env:
-        AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
-      run: python chapter_uploader.py
+        AUTH_TOKEN: ${{ secrets.CI_SESSION }}
+      run: python auto_upload.py
 
-    - name: 6. Commit and push changes
+    - name: 6. Commit file đã chỉnh sửa
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add . 
-        # Chỉ commit và push nếu có thay đổi
-        if ! git diff --staged --quiet; then
-          git commit -m "Auto: Update chapter files after upload"
-          git push
-        else
-          echo "No changes to commit."
-        fi
+        git config user.name "GitHub Actions Bot"
+        git config user.email "actions@github.com"
+        git add noveldata/
+        git commit -m "🤖 Xóa chương đã đăng tự động [CI]" || echo "Không có thay đổi"
+        git push
