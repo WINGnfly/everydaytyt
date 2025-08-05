@@ -4,11 +4,10 @@ import os
 import time
 
 # === CẤU HÌNH COOKIE ===
-cookie_ci_session = os.getenv("CI_SESSION")  # lấy từ biến môi trường GitHub Actions
+cookie_ci_session = os.getenv("CI_SESSION")  # lấy từ GitHub Secrets
 
 # === THƯ MỤC CHỨA TRUYỆN ===
 DATA_DIR = "noveldata"
-BATCH_SIZE = 10
 
 # === HÀM TÁCH CHƯƠNG ===
 def split_chapters(text):
@@ -20,8 +19,8 @@ def extract_start_number(chapter_text):
     match = re.search(r'^Chương\s+(\d+)', chapter_text, re.IGNORECASE)
     return int(match.group(1)) if match else None
 
-# === GỬI LÔ CHƯƠNG ===
-def send_batch(story_id, start_number, chapters):
+# === HÀM GỬI 1 LÔ CHƯƠNG ===
+def send_batch(story_id, start_number, chapters, published):
     session = requests.Session()
     session.cookies.set("ci_session", cookie_ci_session)
 
@@ -48,10 +47,10 @@ def send_batch(story_id, start_number, chapters):
         "number_from": start_number,
         "number_to": start_number + len(chapters) - 1,
         "chapter_content": chapter_content,
-        "published": 1
+        "published": published
     }
 
-    print(f"📤 Gửi chương {data['number_from']} → {data['number_to']} ...")
+    print(f"📤 Gửi chương {data['number_from']} → {data['number_to']} (published = {published}) ...")
 
     try:
         res = session.post(
@@ -61,13 +60,13 @@ def send_batch(story_id, start_number, chapters):
             timeout=30
         )
         res.raise_for_status()
-        print("✅ Thành công!")
+        print("✅ Gửi thành công!")
         return True
     except Exception as e:
         print(f"❌ Lỗi khi gửi chương {start_number}-{start_number + len(chapters) - 1}: {e}")
         return False
 
-# === QUÉT FILE TRONG THƯ MỤC ===
+# === DUYỆT TẤT CẢ FILE TRUYỆN ===
 for filename in os.listdir(DATA_DIR):
     if filename.startswith("truyen_") and filename.endswith(".txt"):
         story_id = filename.replace("truyen_", "").replace(".txt", "")
@@ -77,25 +76,37 @@ for filename in os.listdir(DATA_DIR):
             raw = f.read()
 
         chapters = split_chapters(raw)
-        if len(chapters) < 21:
-            print(f"⚠️ Bỏ qua {filename} (chỉ có {len(chapters)} chương, yêu cầu tối thiểu 20).")
+        total_chapters = len(chapters)
+
+        if total_chapters == 0:
+            print(f"⚠️ Bỏ qua {filename}: không có chương nào.")
             continue
 
-        start_number = extract_start_number(chapters[0])
+        is_draft = total_chapters < 20
+        if is_draft:
+            print(f"📄 Truyện {filename} chỉ có {total_chapters} chương → gửi ở chế độ NHÁP (published = 0)")
+
+        published = 0 if is_draft else 1
+
+        # 👇 Nếu ít hơn 10 chương → gửi hết
+        batch_size = min(10, total_chapters)
+        batch = chapters[:batch_size]
+
+        start_number = extract_start_number(batch[0])
         if start_number is None:
             print(f"❌ Không tìm thấy số bắt đầu trong {filename}. Bỏ qua.")
             continue
 
-        batch = chapters[:BATCH_SIZE]
-        success = send_batch(story_id, start_number, batch)
+        success = send_batch(story_id, start_number, batch, published)
 
-        # Nếu gửi thành công → ghi lại phần chưa gửi vào file
         if success:
-            remaining = "\n\n".join(chapters[BATCH_SIZE:])
+            remaining = "\n\n".join(chapters[batch_size:])
             with open(file_path, "w", encoding="utf-8") as f:
                 f.write(remaining)
-            print(f"🗑 Đã xóa chương {start_number} → {start_number + BATCH_SIZE - 1} khỏi {filename}")
+            print(f"🗑 Đã xóa chương {start_number} → {start_number + batch_size - 1} khỏi {filename}")
         else:
-            print(f"⚠️ Bỏ qua xóa chương do gửi lỗi.")
-            
+            print(f"⚠️ Gửi thất bại. Không xóa chương trong {filename}")
+
+        # 💤 Delay 60s giữa các truyện
+        print("⏳ Nghỉ 60 giây trước khi xử lý truyện tiếp theo...\n")
         time.sleep(60)
