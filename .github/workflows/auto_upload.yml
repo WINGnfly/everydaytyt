@@ -1,45 +1,35 @@
-name: Auto Upload Chapters
+name: Auto Upload Chapter
 
 on:
   schedule:
-    # Chạy phút thứ 5, mỗi 2 giờ, từ 9h sáng đến 1h sáng (hôm sau) giờ VN.
-    # Tức là KHÔNG chạy trong khung giờ 2h sáng - 8h sáng VN.
-    # (Tương đương 2h-18h UTC, mỗi 2 giờ)
-    - cron: '5 0-19/1 * * *'
-  workflow_dispatch:  # Cho phép chạy thủ công
-  
+    - cron: '*/30 0-19/1 * * *'  # Chạy mỗi 6 giờ (15 phút sau mỗi 6 giờ)
+  workflow_dispatch:
+
 permissions:
-  contents: write
-  
+  contents: write  # ✅ Cho phép ghi file đã chỉnh sửa
+
 jobs:
   upload:
     runs-on: ubuntu-latest
 
     steps:
-    - name: 1. Checkout repo
-      uses: actions/checkout@v4
+    - name: 📥 Checkout code
+      uses: actions/checkout@v3
 
-    - name: 2. Setup Python
-      uses: actions/setup-python@v5
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
       with:
-        python-version: 3.11
+        python-version: '3.11'
 
-    - name: 3. Install dependencies
+    - name: 📦 Install dependencies
       run: pip install requests
 
-    # 👇 BƯỚC MỚI: Thêm delay ngẫu nhiên 👇
-    - name: 4. Add random delay (0-1 minutes)
-      run: |
-        delay_seconds=$((RANDOM % 61))
-        echo "Delaying for $delay_seconds seconds to avoid simultaneous runs..."
-        sleep $delay_seconds
-        
-    - name: 5. Run upload script
+    - name: 🚀 Run auto uploader
       env:
-        AUTH_TOKEN: ${{ secrets.CI_SESSION }}
+        CI_SESSION: ${{ secrets.CI_SESSION }}
       run: python auto_upload.py
 
-    - name: 6. Commit file đã chỉnh sửa
+    - name: 💾 Commit file đã chỉnh sửa
       run: |
         git config user.name "GitHub Actions Bot"
         git config user.email "actions@github.com"
