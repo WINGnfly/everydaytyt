@@ -97,3 +97,5 @@ for filename in os.listdir(DATA_DIR):
             print(f"🗑 Đã xóa chương {start_number} → {start_number + BATCH_SIZE - 1} khỏi {filename}")
         else:
             print(f"⚠️ Bỏ qua xóa chương do gửi lỗi.")
+            
+    time.sleep(60)
