@@ -77,7 +77,7 @@ for filename in os.listdir(DATA_DIR):
             raw = f.read()
 
         chapters = split_chapters(raw)
-        if len(chapters) < 20:
+        if len(chapters) < 21:
             print(f"⚠️ Bỏ qua {filename} (chỉ có {len(chapters)} chương, yêu cầu tối thiểu 20).")
             continue
 
