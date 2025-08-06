@@ -2,7 +2,7 @@ name: Auto Upload Chapter
 
 on:
   schedule:
-    - cron: '*/20 22-19 * * *'  # Chạy mỗi 6 giờ (15 phút sau mỗi 6 giờ)
+    - cron: '*/20 0-19 * * *'  # Chạy mỗi 6 giờ (15 phút sau mỗi 6 giờ)
   workflow_dispatch:
 
 permissions:
