@@ -4,10 +4,10 @@ import os
 import time
 
 # === CẤU HÌNH COOKIE ===
-cookie_ci_session = os.getenv("Chrome_SESSION")  # lấy từ GitHub Secrets
+cookie_ci_session = os.getenv("HY_CI_SESSION")  # lấy từ GitHub Secrets
 
 # === THƯ MỤC CHỨA TRUYỆN ===
-DATA_DIR = "CR_noveldata"
+DATA_DIR = "noveldata_HY"
 
 # === HÀM TÁCH CHƯƠNG ===
 def split_chapters(text):
