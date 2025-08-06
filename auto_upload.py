@@ -108,5 +108,5 @@ for filename in os.listdir(DATA_DIR):
             print(f"⚠️ Gửi thất bại. Không xóa chương trong {filename}")
 
         # 💤 Delay 60s giữa các truyện
-        print("⏳ Nghỉ 60 giây trước khi xử lý truyện tiếp theo...\n")
-        time.sleep(60)
+        print("⏳ Nghỉ 20 giây trước khi xử lý truyện tiếp theo...\n")
+        time.sleep(10)
