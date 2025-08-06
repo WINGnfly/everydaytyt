@@ -26,7 +26,7 @@ jobs:
       
     - name: Add random delay (0-1 minutes)
       run: |
-        delay_seconds=$((RANDOM % 21))
+        delay_seconds=$((RANDOM % 11))
         echo "Delaying for $delay_seconds seconds to avoid simultaneous runs..."
         sleep $delay_seconds
         
@@ -34,11 +34,18 @@ jobs:
       env:
         CI_SESSION: ${{ secrets.CI_SESSION }}
       run: python auto_upload.py
+      
+    - name: 🚀 Run auto uploader (Chrome version)
+      env:
+        CI_SESSION: ${{ secrets.CR_CI_SESSION }}
+      run: python CR_auto_upload.py
 
     - name: 💾 Commit file đã chỉnh sửa
       run: |
         git config user.name "GitHub Actions Bot"
         git config user.email "actions@github.com"
         git add noveldata/
+        git commit -m "🤖 Xóa chương đã đăng tự động [CI]" || echo "Không có thay đổi"
+        git add CR_noveldata/
         git commit -m "🤖 Xóa chương đã đăng tự động [CI]" || echo "Không có thay đổi"
         git push
