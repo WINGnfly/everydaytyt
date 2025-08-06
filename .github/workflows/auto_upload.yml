@@ -32,7 +32,7 @@ jobs:
       
     - name: 🚀 Run auto uploader (Chrome version)
       env:
-        CI_SESSION: ${{ secrets.CR_CI_SESSION }}
+        CI_SESSION: ${{ secrets.Chrome_SESSION }}
       run: python CR_auto_upload.py
 
     - name: 💾 Commit file đã chỉnh sửa
