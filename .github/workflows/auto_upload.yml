@@ -2,7 +2,7 @@ name: Auto Upload Chapter
 
 on:
   schedule:
-    - cron: '*/20 0-19 * * *'  # Chạy mỗi 6 giờ (15 phút sau mỗi 6 giờ)
+    - cron: '*/20 22-19 * * *'  # Chạy mỗi 6 giờ (15 phút sau mỗi 6 giờ)
   workflow_dispatch:
 
 permissions:
@@ -26,7 +26,7 @@ jobs:
       
     - name: Add random delay (0-1 minutes)
       run: |
-        delay_seconds=$((RANDOM % 61))
+        delay_seconds=$((RANDOM % 21))
         echo "Delaying for $delay_seconds seconds to avoid simultaneous runs..."
         sleep $delay_seconds
         
