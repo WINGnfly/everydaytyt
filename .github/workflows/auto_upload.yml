@@ -32,8 +32,8 @@ jobs:
       
     - name: 🚀 Run auto uploader (Chrome version)
       env:
-        CI_SESSION: ${{ secrets.Chrome_SESSION }}
-      run: python CR_auto_upload.py
+        CI_SESSION: ${{ secrets.HY_CI_SESSION }}
+      run: python HY_auto_upload.py
 
     - name: 💾 Commit file đã chỉnh sửa
       run: |
