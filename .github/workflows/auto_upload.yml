@@ -29,6 +29,11 @@ jobs:
         delay_seconds=$((RANDOM % 11))
         echo "Delaying for $delay_seconds seconds to avoid simultaneous runs..."
         sleep $delay_seconds
+        
+    - name: 🚀 Run auto uploader (default)
+      env:
+        CI_SESSION: ${{ secrets.CI_SESSION }}
+      run: python auto_upload.py
       
     - name: 🚀 Run auto uploader (Chrome version)
       env:
