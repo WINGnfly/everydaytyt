@@ -4,7 +4,7 @@ import os
 import time
 
 # === CẤU HÌNH COOKIE ===
-cookie_ci_session = os.getenv("CR_SESSION")  # lấy từ GitHub Secrets
+cookie_ci_session = os.getenv("Chrome_SESSION")  # lấy từ GitHub Secrets
 
 # === THƯ MỤC CHỨA TRUYỆN ===
 DATA_DIR = "CR_noveldata"
