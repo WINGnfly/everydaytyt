@@ -5,6 +5,9 @@ import time
 
 # === CẤU HÌNH COOKIE ===
 cookie_ci_session = os.getenv("CI_SESSION")  # lấy từ GitHub Secrets
+if not cookie_ci_session:
+    print("❌ Không tìm thấy CI_SESSION. Vui lòng thiết lập biến môi trường.")
+    exit(1)
 
 # === THƯ MỤC CHỨA TRUYỆN ===
 DATA_DIR = "noveldata"
@@ -60,8 +63,16 @@ def send_batch(story_id, start_number, chapters, published):
             timeout=30
         )
         res.raise_for_status()
-        print("✅ Gửi thành công!")
-        return True
+        response_data = res.json()
+
+        # Kiểm tra message có chứa "Thêm thành công:"
+        if "Thêm thành công:" in response_data.get("message", ""):
+            print("✅ Gửi thành công!")
+            return True
+        else:
+            print(f"❌ Gửi thất bại hoặc không đúng định dạng: {response_data.get('message')}")
+            return False
+
     except Exception as e:
         print(f"❌ Lỗi khi gửi chương {start_number}-{start_number + len(chapters) - 1}: {e}")
         return False
