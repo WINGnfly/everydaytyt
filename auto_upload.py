@@ -93,7 +93,7 @@ for filename in os.listdir(DATA_DIR):
             print(f"⚠️ Bỏ qua {filename}: không có chương nào.")
             continue
 
-        is_draft = total_chapters < 20
+        is_draft = total_chapters < 11
         if is_draft:
             print(f"📄 Truyện {filename} chỉ có {total_chapters} chương → gửi ở chế độ NHÁP (published = 0)")
 
