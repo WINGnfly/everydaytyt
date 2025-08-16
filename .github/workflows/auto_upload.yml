@@ -2,7 +2,7 @@ name: Auto Upload Chapter
 
 on:
   schedule:
-    - cron: '41 * * * *'
+    - cron: '37 * * * *'
   workflow_dispatch:
 
 permissions:
