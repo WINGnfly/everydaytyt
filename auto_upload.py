@@ -93,11 +93,13 @@ for filename in os.listdir(DATA_DIR):
             print(f"⚠️ Bỏ qua {filename}: không có chương nào.")
             continue
 
-        is_draft = total_chapters < 11
-        if is_draft:
-            print(f"📄 Truyện {filename} chỉ có {total_chapters} chương → gửi ở chế độ NHÁP (published = 0)")
+        # is_draft = total_chapters < 11
+        # if is_draft:
+        #     print(f"📄 Truyện {filename} chỉ có {total_chapters} chương → gửi ở chế độ NHÁP (published = 0)")
 
-        published = 0 if is_draft else 1
+        # published = 0 if is_draft else 1
+
+        published = 1
 
         # 👇 Nếu ít hơn 10 chương → gửi hết
         batch_size = min(10, total_chapters)
