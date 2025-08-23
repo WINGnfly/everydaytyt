@@ -71,7 +71,7 @@ def send_batch(story_id, start_number, chapters, published):
             return True
         else:
             print(f"❌ Gửi thất bại hoặc không đúng định dạng: {response_data.get('message')}")
-            return True
+            return False
 
     except Exception as e:
         print(f"❌ Lỗi khi gửi chương {start_number}-{start_number + len(chapters) - 1}: {e}")
@@ -122,4 +122,4 @@ for filename in os.listdir(DATA_DIR):
 
         # 💤 Delay 60s giữa các truyện
         print("⏳ Nghỉ 60 giây trước khi xử lý truyện tiếp theo...\n")
-        time.sleep(5)
+        time.sleep(120)
