@@ -66,12 +66,12 @@ def send_batch(story_id, start_number, chapters, published):
         response_data = res.json()
 
         # Kiểm tra message có chứa "Thêm thành công:"
-        if "Thêm thành công:" in response_data.get("message", ""):
-            print("✅ Gửi thành công!")
-            return True
-        else:
-            print(f"❌ Gửi thất bại hoặc không đúng định dạng: {response_data.get('message')}")
-            return False
+        # if "Thêm thành công:" in response_data.get("message", ""):
+        #     print("✅ Gửi thành công!")
+        #     return True
+        # else:
+        #     print(f"❌ Gửi thất bại hoặc không đúng định dạng: {response_data.get('message')}")
+        #     return False
 
     except Exception as e:
         print(f"❌ Lỗi khi gửi chương {start_number}-{start_number + len(chapters) - 1}: {e}")
