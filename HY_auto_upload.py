@@ -122,4 +122,4 @@ for filename in os.listdir(DATA_DIR):
 
         # 💤 Delay 60s giữa các truyện
         print("⏳ Nghỉ 60 giây trước khi xử lý truyện tiếp theo...\n")
-        time.sleep(60)
+        time.sleep(6)
