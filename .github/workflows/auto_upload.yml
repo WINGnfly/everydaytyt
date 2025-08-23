@@ -1,4 +1,4 @@
-name: Auto Upload Chapter
+name: Auto Upload Chapter 
 
 on:
   schedule:
@@ -7,6 +7,11 @@ on:
 
 permissions:
   contents: write  # ✅ Cho phép ghi file đã chỉnh sửa
+
+# 👇 Đảm bảo chỉ chạy 1 job tại một thời điểm
+concurrency:
+  group: auto-upload
+  cancel-in-progress: false   # job mới sẽ phải đợi job cũ chạy xong
 
 jobs:
   upload:
@@ -40,13 +45,25 @@ jobs:
         CI_SESSION: ${{ secrets.HY_CI_SESSION }}
       run: python HY_auto_upload.py
 
-    - name: 💾 Commit file đã chỉnh sửa
+    - name: 💾 Commit file đã chỉnh sửa (có retry)
       run: |
         git config user.name "GitHub Actions Bot"
         git config user.email "actions@github.com"
-        git fetch origin main
-        git pull --rebase origin main
-        git add noveldata/ noveldata_HY/
-        git commit -m "🤖 Xóa chương đã đăng tự động [CI]" || echo "Không có thay đổi"
-        git push origin HEAD:main
 
+        max_retries=3
+        count=0
+        until [ $count -ge $max_retries ]
+        do
+          git fetch origin main
+          git pull --rebase origin main || true
+          git add noveldata/ noveldata_HY/
+          git commit -m "🤖 Xóa chương đã đăng tự động [CI]" && git push origin HEAD:main && break
+          count=$((count+1))
+          echo "⚠️ Commit thất bại, thử lại lần $count/$max_retries..."
+          sleep 30
+        done
+
+        if [ $count -ge $max_retries ]; then
+          echo "❌ Push thất bại sau $max_retries lần thử"
+          exit 1
+        fi
