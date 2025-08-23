@@ -44,8 +44,9 @@ jobs:
       run: |
         git config user.name "GitHub Actions Bot"
         git config user.email "actions@github.com"
-        git add noveldata/
+        git fetch origin main
+        git pull --rebase origin main
+        git add noveldata/ noveldata_HY/
         git commit -m "🤖 Xóa chương đã đăng tự động [CI]" || echo "Không có thay đổi"
-        git add noveldata_HY/
-        git commit -m "🤖 Xóa chương đã đăng tự động [CI]" || echo "Không có thay đổi"
-        git push
+        git push origin HEAD:main
+
