@@ -1,4 +1,4 @@
 requests
 beautifulsoup4
-tls-client
+DrissionPage
 boto3
