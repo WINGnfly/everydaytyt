@@ -1,0 +1,53 @@
+name: Auto Upload Chapter
+
+on:
+  schedule:
+    - cron: '47 0-18,23 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: auto-upload
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 1
+
+    - name: Update repo to latest main
+      run: |
+        git fetch origin main
+        git reset --hard origin/main
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run uploader
+      env:
+        CI_SESSION: ${{ secrets.CI_SESSION }}
+        CF_CLEARANCE: ${{ secrets.CF_CLEARANCE }}
+        HY_CI_SESSION: ${{ secrets.HY_CI_SESSION }}
+        HY_CF_CLEARANCE: ${{ secrets.HY_CF_CLEARANCE }}
+        CI_SESSION_7: ${{ secrets.CI_SESSION_7 }}
+        CF_CLEARANCE_7: ${{ secrets.CF_CLEARANCE_7 }}
+        CI_SESSION_LING: ${{ secrets.CI_SESSION_LING }}
+        CF_CLEARANCE_LING: ${{ secrets.CF_CLEARANCE_LING }}
+        BASE_URL: ${{ secrets.BASE_URL }}
+        BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+        CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+        R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+        R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
+        R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        R2_REGION: ${{ secrets.R2_REGION }}
+      run: python upload_DPage.py
