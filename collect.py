@@ -9,11 +9,7 @@ from urllib.parse import urlparse
 
 import boto3
 from botocore.exceptions import ClientError
-from dotenv import load_dotenv
 from DrissionPage import ChromiumPage, ChromiumOptions
-
-load_dotenv()
-sys.stdout.reconfigure(encoding="utf-8")
 
 # Lay cookie session tu GitHub Secrets
 cookie_ci_session = os.getenv("CI_SESSION")
