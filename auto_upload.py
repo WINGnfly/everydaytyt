@@ -10,11 +10,7 @@ import requests
 import boto3
 from botocore.exceptions import ClientError
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv
 from DrissionPage import ChromiumPage, ChromiumOptions
-
-load_dotenv()
-sys.stdout.reconfigure(encoding='utf-8')
 
 # === CẤU HÌNH MAP THƯ MỤC -> COOKIE + CI_SIZE ===
 DIR_CONFIGS = {
