@@ -113,6 +113,7 @@ def create_page(cookie: str, cookie_cf_clearance: str):
     co.headless(True)
     co.set_argument("--no-sandbox")
     co.set_argument("--disable-gpu")
+    co.set_argument("--disable-dev-shm-usage")
 
     page = ChromiumPage(co)
 
