@@ -339,11 +339,11 @@ def adjust_ci_size(ci_size: int, start_number: int) -> int:
         elif start_number < 300:
             return ci_size
         elif start_number < 1000:
-            return ci_size * 3 * random.randint(0, 2)
+            return ci_size * 2 * random.randint(0, 2)
         elif start_number < 3000:
-            return ci_size * 6 * random.randint(0, 2)
+            return ci_size * 4 * random.randint(0, 2)
         else:
-            return ci_size * 9 * random.randint(0, 2)
+            return ci_size * 6 * random.randint(0, 2)
 
     elif ci_size == 1:
         ci_size = random.choice([1, 2])
