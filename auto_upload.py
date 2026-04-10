@@ -94,6 +94,7 @@ def delete_object(client, bucket: str, key: str):
 
 
 def split_chapters(text):
+    text = text.replace('\r\n', '\n')
     chapters = re.split(r'(?=^Chương\s+\d+(?:[:：]|$))', text, flags=re.MULTILINE)
     return [ch.strip() for ch in chapters if ch.strip()]
 
