@@ -333,7 +333,7 @@ def add_story_id(client, bucket: str, key: str, story_id: str):
 def adjust_ci_size(ci_size: int, start_number: int) -> int:
     """Điều chỉnh ci_size dựa vào start_number"""
     if ci_size == 5:
-        ci_size = ci_size + random.randint(0, 2)
+        ci_size = ci_size - random.randint(0, 3)
         if start_number < 100:
             return ci_size * 5 * random.randint(1, 2)
         elif start_number < 300:
