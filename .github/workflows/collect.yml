@@ -20,7 +20,21 @@ jobs:
 
     - name: Install dependencies
       run: pip install -r requirements.txt
+      
+    - name: Install Chrome
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
 
+    # Cài đặt Xvfb (Màn hình ảo)
+    # - name: Install xvfb
+    #   run: sudo apt-get install -y xvfb
+
+    # # Chạy script bằng xvfb-run
+    # - name: Run Python Script
+    #   run: |
+    #     xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python auto_upload.py
+        
     - name: Add random delay (0-10 seconds)
       run: |
         delay_seconds=$((RANDOM % 11))
