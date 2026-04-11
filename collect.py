@@ -110,12 +110,17 @@ def create_page(cookie: str, cookie_cf_clearance: str):
     domain = parsed.hostname or ""
 
     co = ChromiumOptions()
-    co.headless(True)
-    co.set_argument("--no-sandbox")
-    co.set_argument("--disable-gpu")
-    co.set_argument("--disable-dev-shm-usage")
-
-    page = ChromiumPage(co)
+    
+    # KHÔNG dùng co.headless(True) nếu chạy bằng Xvfb (để bypass Cloudflare tốt hơn)
+    # Nếu không dùng Xvfb ở YML, hãy bật dòng dưới đây:
+    co.set_argument('--headless=new') 
+    
+    # Các tham số bắt buộc cho môi trường Linux/Docker/GitHub Actions
+    co.set_argument('--no-sandbox')
+    co.set_argument('--disable-gpu')
+    co.set_argument('--disable-dev-shm-usage')
+    co.set_argument('--window-size=1920,1080') # Fix lỗi hiển thị
+    co.set_argument('--disable-blink-features=AutomationControlled') # Giúp bypass Cloudflare
 
     headers = {
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
