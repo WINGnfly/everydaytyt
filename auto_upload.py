@@ -175,8 +175,8 @@ def create_page(cookie: str, cookie_cf_clearance: str):
     co.set_argument('--no-sandbox')
     co.set_argument('--disable-gpu')
     co.set_argument('--disable-dev-shm-usage')
-    co.set_argument('--window-size=1920,1080') # Fix lỗi hiển thị
-    co.set_argument('--disable-blink-features=AutomationControlled') # Giúp bypass Cloudflare
+    # co.set_argument('--window-size=1920,1080') # Fix lỗi hiển thị
+    # co.set_argument('--disable-blink-features=AutomationControlled') # Giúp bypass Cloudflare
     
     time.sleep(2)
     
