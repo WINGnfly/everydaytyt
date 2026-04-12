@@ -169,8 +169,9 @@ def create_page(cookie: str, cookie_cf_clearance: str):
     
     # KHÔNG dùng co.headless(True) nếu chạy bằng Xvfb (để bypass Cloudflare tốt hơn)
     # Nếu không dùng Xvfb ở YML, hãy bật dòng dưới đây:
-    co.headless(True)
-    
+    # co.headless(True)
+    co.headless = True
+
     # Các tham số bắt buộc cho môi trường Linux/Docker/GitHub Actions
     co.set_argument('--no-sandbox')
     co.set_argument('--disable-gpu')
