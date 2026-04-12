@@ -32,10 +32,10 @@ jobs:
     - name: Install dependencies
       run: pip install -r requirements.txt
 
-    # - name: Install Chrome
-    #   run: |
-    #     sudo apt-get update
-    #     sudo apt-get install -y google-chrome-stable
+    - name: Install Chrome
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
 
     # Cài đặt Xvfb (Màn hình ảo)
     # - name: Install xvfb
