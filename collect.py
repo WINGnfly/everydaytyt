@@ -121,7 +121,11 @@ def create_page(cookie: str, cookie_cf_clearance: str):
     co.set_argument('--disable-dev-shm-usage')
     # co.set_argument('--window-size=1920,1080') # Fix lỗi hiển thị
     # co.set_argument('--disable-blink-features=AutomationControlled') # Giúp bypass Cloudflare
-
+    
+    time.sleep(2)
+    
+    page = ChromiumPage(co)
+    
     headers = {
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
