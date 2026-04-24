@@ -486,12 +486,14 @@ def main():
             else:
                 print(f"🗑 Đã xóa {sent_count} chương khỏi {filename}")
 
-            delay = max(0, 300 - (sent_count * 3)) + random.randint(0, 20)
+            time.sleep(random.randint(0, 20))
+            page.close()
+            delay = max(0, 300 - (sent_count * 3))
             print(f"⏳ Nghỉ {delay} giây trước khi xử lý file tiếp theo...\n")
             time.sleep(delay)
         else:
             print(f"⚠️ Gửi thất bại, chưa gửi được chương nào trong {filename}. Không xóa chương.")
-
+        
         page.quit()
 
 
