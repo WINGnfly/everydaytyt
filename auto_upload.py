@@ -178,7 +178,7 @@ def create_page(cookie: str, cookie_cf_clearance: str):
     # co.set_argument('--window-size=1920,1080') # Fix lỗi hiển thị
     # co.set_argument('--disable-blink-features=AutomationControlled') # Giúp bypass Cloudflare
     
-    time.sleep(2)
+    # time.sleep(2)
     
     page = ChromiumPage(co)
 
@@ -195,21 +195,27 @@ def create_page(cookie: str, cookie_cf_clearance: str):
     ]
     page.set.cookies(cookies)
 
-    # Mở trang gốc để thiết lập origin và đảm bảo cookie được gửi kèm khi dùng fetch
     for attempt in range(3):
         try:
             page.get(BASE_URL)
-        except Exception as e:
-            print(f"⚠️ Không thể truy cập {BASE_URL}: {e}")
-            time.sleep(3)
-            continue
+            page.wait(2, 4) 
+            html = ""
+            try:
+                html = (page.html or "").lower()
+            except Exception:
+                continue
 
-        html = (page.html or "").lower()
-        if "just a moment" in html or "checking your browser" in html:
-            print("⚠️ Phát hiện Cloudflare challenge, đợi 5s rồi thử lại...")
-            time.sleep(5)
+            if "just a moment" in html or "checking your browser" in html:
+                print(f"⚠️ Lần {attempt+1}: Phát hiện Cloudflare, đợi thêm...")
+                page.wait(5, 7)
+                continue
+            
+            return page
+
+        except Exception as e:
+            print(f"⚠️ Lần {attempt+1} gặp lỗi kỹ thuật: {e}")
+            page.wait(3)
             continue
-        break
 
     return page
 
@@ -487,14 +493,14 @@ def main():
                 print(f"🗑 Đã xóa {sent_count} chương khỏi {filename}")
 
             time.sleep(random.randint(0, 20))
-            page.close()
+            page.quit()
             delay = max(0, 300 - (sent_count * 3))
             print(f"⏳ Nghỉ {delay} giây trước khi xử lý file tiếp theo...\n")
             time.sleep(delay)
         else:
             print(f"⚠️ Gửi thất bại, chưa gửi được chương nào trong {filename}. Không xóa chương.")
         
-        page.quit()
+        
 
 
 if __name__ == "__main__":
