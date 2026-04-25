@@ -198,7 +198,8 @@ def create_page(cookie: str, cookie_cf_clearance: str):
     for attempt in range(3):
         try:
             page.get(BASE_URL)
-            page.wait(2, 4) 
+            page.wait(2, 4)
+            page.wait.load_complete()
             html = ""
             try:
                 html = (page.html or "").lower()
