@@ -199,7 +199,7 @@ def create_page(cookie: str, cookie_cf_clearance: str):
         try:
             page.get(BASE_URL)
             page.wait(2, 4)
-            page.wait.load_complete()
+            page.wait.load_start()
             html = ""
             try:
                 html = (page.html or "").lower()
