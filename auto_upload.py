@@ -436,13 +436,13 @@ def main():
 
         start_number_first = extract_start_number(chapters[0])
         if start_number_first is None:
-            print(f"❌ Bỏ qua {filename} vì không tìm thấy số bắt đầu")
+            print(f"❌ Bỏ qua {filename} vì không tìm thấy số bắt đầu\n")
             continue
 
         ci_size = adjust_ci_size(ci_size, start_number_first) if ci_size != 0 else ci_size
         ci_size = min(400, ci_size)
         if ci_size == 0:
-            print(f"⏸ Bỏ qua {filename} vì ci_size = 0")
+            print(f"⏸ Bỏ qua {filename} vì ci_size = 0\n")
             continue
         else:
             print(f"📌 {filename} sẽ thử gửi {ci_size} chương")
