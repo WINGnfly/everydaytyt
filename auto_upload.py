@@ -178,7 +178,7 @@ def create_page(cookie: str, cookie_cf_clearance: str):
     # co.set_argument('--window-size=1920,1080') # Fix lỗi hiển thị
     # co.set_argument('--disable-blink-features=AutomationControlled') # Giúp bypass Cloudflare
     
-    # time.sleep(2)
+    time.sleep(2)
     
     page = ChromiumPage(co)
 
@@ -195,28 +195,21 @@ def create_page(cookie: str, cookie_cf_clearance: str):
     ]
     page.set.cookies(cookies)
 
+    # Mở trang gốc để thiết lập origin và đảm bảo cookie được gửi kèm khi dùng fetch
     for attempt in range(3):
         try:
             page.get(BASE_URL)
-            page.wait(2, 4)
-            page.wait.load_start()
-            html = ""
-            try:
-                html = (page.html or "").lower()
-            except Exception:
-                continue
-
-            if "just a moment" in html or "checking your browser" in html:
-                print(f"⚠️ Lần {attempt+1}: Phát hiện Cloudflare, đợi thêm...")
-                page.wait(5, 7)
-                continue
-            
-            return page
-
         except Exception as e:
-            print(f"⚠️ Lần {attempt+1} gặp lỗi kỹ thuật: {e}")
-            page.wait(3)
+            print(f"⚠️ Không thể truy cập {BASE_URL}: {e}")
+            time.sleep(3)
             continue
+
+        html = (page.html or "").lower()
+        if "just a moment" in html or "checking your browser" in html:
+            print("⚠️ Phát hiện Cloudflare challenge, đợi 5s rồi thử lại...")
+            time.sleep(5)
+            continue
+        break
 
     return page
 
@@ -351,7 +344,7 @@ def add_story_id(client, bucket: str, key: str, story_id: str):
 def adjust_ci_size(ci_size: int, start_number: int) -> int:
     """Điều chỉnh ci_size dựa vào start_number"""
     if ci_size == 5:
-        ci_size = ci_size - random.randint(0, 3)
+        ci_size = ci_size + random.randint(0, 3)
         if start_number < 100:
             return ci_size * 5 * random.randint(1, 2)
         elif start_number < 300:
@@ -436,13 +429,13 @@ def main():
 
         start_number_first = extract_start_number(chapters[0])
         if start_number_first is None:
-            print(f"❌ Bỏ qua {filename} vì không tìm thấy số bắt đầu\n")
+            print(f"❌ Bỏ qua {filename} vì không tìm thấy số bắt đầu")
             continue
 
         ci_size = adjust_ci_size(ci_size, start_number_first) if ci_size != 0 else ci_size
         ci_size = min(400, ci_size)
         if ci_size == 0:
-            print(f"⏸ Bỏ qua {filename} vì ci_size = 0\n")
+            print(f"⏸ Bỏ qua {filename} vì ci_size = 0")
             continue
         else:
             print(f"📌 {filename} sẽ thử gửi {ci_size} chương")
@@ -493,17 +486,14 @@ def main():
             else:
                 print(f"🗑 Đã xóa {sent_count} chương khỏi {filename}")
 
-            time.sleep(random.randint(0, 20))
-            page.quit()
-            delay = max(0, 300 - (sent_count * 3))
+            delay = max(0, 300 - (sent_count * 3) + random.randint(0, 20))
             print(f"⏳ Nghỉ {delay} giây trước khi xử lý file tiếp theo...\n")
             time.sleep(delay)
         else:
             print(f"⚠️ Gửi thất bại, chưa gửi được chương nào trong {filename}. Không xóa chương.")
         
-        
+        page.quit()
 
 
 if __name__ == "__main__":
     main()
-
