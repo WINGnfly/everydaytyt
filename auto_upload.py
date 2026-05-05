@@ -198,6 +198,8 @@ def create_page(cookie: str, cookie_cf_clearance: str):
     # Mở trang gốc để thiết lập origin và đảm bảo cookie được gửi kèm khi dùng fetch
     for attempt in range(3):
         try:
+            if BASE_URL is None:
+                raise ValueError("BASE_URL is not configured")
             page.get(BASE_URL)
         except Exception as e:
             print(f"⚠️ Không thể truy cập {BASE_URL}: {e}")
@@ -381,118 +383,118 @@ def adjust_ci_size(ci_size: int, start_number: int) -> int:
         else:
             return ci_size + random.randint(100, 200)
 
+    return ci_size
+
 
 def main():
     r2 = get_r2_client()
-    all_files = []
+    if not R2_BUCKET:
+        raise RuntimeError("R2_BUCKET không được cấu hình.")
+
     for d, conf in DIR_CONFIGS.items():
         if not conf.get("cookie") or not conf.get("cookie_cf_clearance"):
             print(f"⚠️ Bỏ qua {d}: thiếu cookie hoặc cf_clearance.")
             continue
-        for key in list_truyen_keys(r2, R2_BUCKET, d):
-            all_files.append(
-                {
-                    "key": key,
-                    "cookie": conf["cookie"],
-                    "cookie_cf_clearance": conf.get("cookie_cf_clearance"),
-                    "size": conf["size"],
-                }
-            )
-
-    random.shuffle(all_files)
-    print(f"📂 Tổng số file cần xử lý: {len(all_files)}")
-
-    for f in all_files:
-        object_key = f["key"]
-        cookie = f["cookie"]
-        cookie_cf_clearance = f.get("cookie_cf_clearance")
-        ci_size = f["size"]
-
-        dirname, filename = posixpath.split(object_key)
-        story_id = filename.replace("truyen_", "").replace(".txt", "")
-        story_id_list_key = posixpath.join(dirname, "storyidlist.txt")
-
-        raw = get_object_text(r2, R2_BUCKET, object_key)
-
-        chapters = split_chapters(raw)
-        total_chapters = len(chapters)
-
-        if total_chapters == 0:
-            print(f"⚠️ Bỏ qua {filename}: không có chương hợp lệ.")
+        object_keys = list_truyen_keys(r2, R2_BUCKET, d)
+        if not object_keys:
+            print(f"ℹ️ {d}: không có file truyen_*.txt để xử lý.")
             continue
 
-        published = 1
-        max_batch = 10
+        random.shuffle(object_keys)
+        print(f"📂 {d}: tổng số file cần xử lý: {len(object_keys)}")
 
-        sent_count = 0
-        success_all = True
+        page = None
+        try:
+            page = create_page(conf["cookie"], conf["cookie_cf_clearance"])
 
-        start_number_first = extract_start_number(chapters[0])
-        if start_number_first is None:
-            print(f"❌ Bỏ qua {filename} vì không tìm thấy số bắt đầu")
-            continue
+            for object_key in object_keys:
+                ci_size = conf["size"]
+                dirname, filename = posixpath.split(object_key)
+                story_id = filename.replace("truyen_", "").replace(".txt", "")
+                story_id_list_key = posixpath.join(dirname, "storyidlist.txt")
 
-        ci_size = adjust_ci_size(ci_size, start_number_first) if ci_size != 0 else ci_size
-        ci_size = min(400, ci_size)
-        if ci_size == 0:
-            print(f"⏸ Bỏ qua {filename} vì ci_size = 0")
-            continue
-        else:
-            print(f"📌 {filename} sẽ thử gửi {ci_size} chương")
+                raw = get_object_text(r2, R2_BUCKET, object_key)
 
-        page = create_page(cookie, cookie_cf_clearance)
+                chapters = split_chapters(raw)
+                total_chapters = len(chapters)
 
-        while sent_count < ci_size and sent_count < total_chapters:
-            remaining_quota = ci_size - sent_count
-            batch_size = min(max_batch, remaining_quota)
-            this_batch = chapters[sent_count : sent_count + batch_size]
+                if total_chapters == 0:
+                    print(f"⚠️ Bỏ qua {filename}: không có chương hợp lệ.")
+                    continue
 
-            start_number = extract_start_number(this_batch[0])
-            if start_number is None:
-                print(f"❌ Bỏ qua {filename} vì không tìm thấy số bắt đầu")
-                success_all = False
-                break
+                published = 1
+                max_batch = 10
 
-            if 40 <= start_number <= 50:
-                added = add_story_id(r2, R2_BUCKET, story_id_list_key, story_id)
-                if added:
-                    print(f"✅ Đã thêm {story_id} vào {story_id_list_key}")
+                sent_count = 0
+                success_all = True
+
+                start_number_first = extract_start_number(chapters[0])
+                if start_number_first is None:
+                    print(f"❌ Bỏ qua {filename} vì không tìm thấy số bắt đầu")
+                    continue
+
+                ci_size = adjust_ci_size(ci_size, start_number_first) if ci_size != 0 else ci_size
+                ci_size = min(400, ci_size)
+                if ci_size == 0:
+                    print(f"⏸ Bỏ qua {filename} vì ci_size = 0")
+                    continue
                 else:
-                    print(f"ℹ️ {story_id} đã có trong {story_id_list_key}")
+                    print(f"📌 {filename} sẽ thử gửi {ci_size} chương")
 
-            success = send_batch(page, story_id, start_number, this_batch, published)
-            if not success:
-                success_all = False
-                break
+                while sent_count < ci_size and sent_count < total_chapters:
+                    remaining_quota = ci_size - sent_count
+                    batch_size = min(max_batch, remaining_quota)
+                    this_batch = chapters[sent_count : sent_count + batch_size]
 
-            sent_count += len(this_batch)
-            time.sleep((batch_size * 3) + random.randint(5, 10))
+                    start_number = extract_start_number(this_batch[0])
+                    if start_number is None:
+                        print(f"❌ Bỏ qua {filename} vì không tìm thấy số bắt đầu")
+                        success_all = False
+                        break
 
-        if sent_count > 0:
-            remaining = "\n\n".join(chapters[sent_count:])
-            if remaining.strip() == "":
-                delete_object(r2, R2_BUCKET, object_key)
-            else:
-                put_object_text(r2, R2_BUCKET, object_key, remaining)
+                    if 40 <= start_number <= 50:
+                        added = add_story_id(r2, R2_BUCKET, story_id_list_key, story_id)
+                        if added:
+                            print(f"✅ Đã thêm {story_id} vào {story_id_list_key}")
+                        else:
+                            print(f"ℹ️ {story_id} đã có trong {story_id_list_key}")
 
-            if remaining.strip() == "":
-                print(f"File {filename} empty, deleted")
+                    success = send_batch(page, story_id, start_number, this_batch, published)
+                    if not success:
+                        success_all = False
+                        break
 
-                if success_all:
-                    if mark_story_full(page, story_id):
-                        print(f"📗 Truyện {story_id} đã được cập nhật sang FULL")
+                    sent_count += len(this_batch)
+                    time.sleep((batch_size * 3) + random.randint(5, 10))
+
+                if sent_count > 0:
+                    remaining = "\n\n".join(chapters[sent_count:])
+                    if remaining.strip() == "":
+                        delete_object(r2, R2_BUCKET, object_key)
                     else:
-                        print(f"⚠️ Cập nhật truyện {story_id} sang FULL thất bại")
-            else:
-                print(f"🗑 Đã xóa {sent_count} chương khỏi {filename}")
+                        put_object_text(r2, R2_BUCKET, object_key, remaining)
 
-            delay = max(0, 300 - (sent_count * 3) + random.randint(0, 20))
-            print(f"⏳ Nghỉ {delay} giây trước khi xử lý file tiếp theo...\n")
-            time.sleep(delay)
-        else:
-            print(f"⚠️ Gửi thất bại, chưa gửi được chương nào trong {filename}. Không xóa chương.")
-        
-        page.quit()
+                    if remaining.strip() == "":
+                        print(f"File {filename} empty, deleted")
+
+                        if success_all:
+                            if mark_story_full(page, story_id):
+                                print(f"📗 Truyện {story_id} đã được cập nhật sang FULL")
+                            else:
+                                print(f"⚠️ Cập nhật truyện {story_id} sang FULL thất bại")
+                    else:
+                        print(f"🗑 Đã xóa {sent_count} chương khỏi {filename}")
+
+                    delay = max(0, 300 - (sent_count * 3) + random.randint(0, 20))
+                    print(f"⏳ Nghỉ {delay} giây trước khi xử lý file tiếp theo...\n")
+                    time.sleep(delay)
+                else:
+                    print(f"⚠️ Gửi thất bại, chưa gửi được chương nào trong {filename}. Không xóa chương.")
+        except Exception as e:
+            print(f"❌ Lỗi khi xử lý thư mục {d}: {e}")
+        finally:
+            if page is not None:
+                page.quit()
 
 
 if __name__ == "__main__":
