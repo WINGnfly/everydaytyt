@@ -7,7 +7,7 @@ import datetime
 import posixpath
 from urllib.parse import urlparse
 
-import boto3
+import botocore.session
 from botocore.exceptions import ClientError
 from DrissionPage import ChromiumPage, ChromiumOptions
 
