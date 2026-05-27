@@ -1,5 +1,4 @@
 requests
 beautifulsoup4
-DrissionPage
+DrissionPage==4.1.1.2
 boto3
-DataRecorder
