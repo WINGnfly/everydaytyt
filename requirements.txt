@@ -2,3 +2,4 @@ requests
 beautifulsoup4
 DrissionPage
 boto3
+DataRecorder
